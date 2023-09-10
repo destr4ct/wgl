@@ -7,7 +7,7 @@ if is_json!(.message) {
     # If details not just a extra message like connect event
     if is_object(.details) {
         del(.details.event)
-        
+
         # External check
         if is_ipv4(string!(.details.pct.dst_ipv4)) {
             .allowed_subnets = .details.ref.internal_subnets
