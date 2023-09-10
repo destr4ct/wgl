@@ -1,0 +1,39 @@
+if is_json!(.message) {
+    . = parse_json!(.message)
+
+    .time = parse_timestamp!(.time, "%Y-%m-%dT%H:%M:%S%.fZ")
+    del(.msg)
+
+    # If details not just a extra message like connect event
+    if is_object(.details) {
+        del(.details.event)
+
+        # External check
+        if is_ipv4(string!(.details.pct.dst_ipv4)) {
+            .details = .details.pct
+
+            # Construct src/target
+            if exists(.details.dst_ipv4) {
+                .src = string!(.details.src_ipv4) + ":" + to_string!(.details.src_port)
+                .dst = string!(.details.dst_ipv4) + ":" + to_string!(.details.dst_port)
+            } else {
+                .src = string!(.details.src_ipv6) + ":" + to_string!(.details.src_port)
+                .dst = string!(.details.dst_ipv6) + ":" + to_string!(.details.dst_port)
+            }
+        
+            .src_mac = .details.src_mac
+            .details = .details.src_detailed
+            .type = "external"
+
+        } else {
+            .details = .details.wg_pct
+            .type = "internal"
+        }
+
+    } else {
+        if exists(.details) {
+            .new_client = split!(.details, " ")[0]
+        }
+    }
+    .message = .
+}

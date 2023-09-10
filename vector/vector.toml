@@ -1,0 +1,13 @@
+[sources.in]
+type = "file"
+include=["./wgl.log"]
+
+[transforms.trf]
+type = "remap"
+inputs = ["in"]
+file = './vector/parse.vrl'
+
+[sinks.out]
+inputs = ["trf"]
+type = "console"
+encoding.codec = "text"
